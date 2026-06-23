@@ -1,11 +1,8 @@
-import DOMPurify from "isomorphic-dompurify";
-
 const ALLOWED_EMBED_HOSTS = [
   "soundcloud.com",
   "w.soundcloud.com",
   "bandcamp.com",
   "youtube.com",
-  "www.youtube.com",
   "youtu.be",
   "vimeo.com",
   "player.vimeo.com",
@@ -23,30 +20,23 @@ function isAllowedEmbedUrl(url: string) {
   }
 }
 
-export function sanitizeEmbedHtml(html: string) {
-  const sanitized = DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ["iframe", "div", "blockquote", "a"],
-    ALLOWED_ATTR: [
-      "src",
-      "width",
-      "height",
-      "frameborder",
-      "allow",
-      "allowfullscreen",
-      "loading",
-      "title",
-      "class",
-      "style",
-      "href",
-    ],
-  });
+function extractIframeSrc(html: string) {
+  const match = html.match(/<iframe[^>]+src=["']([^"']+)["']/i);
+  return match?.[1] ?? null;
+}
 
-  const srcMatch = sanitized.match(/src=["']([^"']+)["']/i);
-  if (srcMatch && !isAllowedEmbedUrl(srcMatch[1])) {
+function buildIframe(src: string, height = "315") {
+  return `<iframe src="${src}" width="100%" height="${height}" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen loading="lazy" title="Embed"></iframe>`;
+}
+
+export function sanitizeEmbedHtml(html: string) {
+  const src = extractIframeSrc(html);
+  if (!src || !isAllowedEmbedUrl(src)) {
     return "";
   }
 
-  return sanitized;
+  const heightMatch = html.match(/height=["'](\d+)["']/i);
+  return buildIframe(src, heightMatch?.[1] ?? "315");
 }
 
 export function urlToEmbedHtml(url: string) {
@@ -66,36 +56,32 @@ export function urlToEmbedHtml(url: string) {
           ? parsed.pathname.slice(1)
           : parsed.searchParams.get("v");
       if (!videoId) return "";
-      return sanitizeEmbedHtml(
-        `<iframe src="https://www.youtube.com/embed/${videoId}" width="100%" height="315" frameborder="0" allowfullscreen loading="lazy"></iframe>`
-      );
+      return buildIframe(`https://www.youtube.com/embed/${videoId}`);
     }
 
     if (host === "vimeo.com") {
       const id = parsed.pathname.split("/").filter(Boolean).pop();
       if (!id) return "";
-      return sanitizeEmbedHtml(
-        `<iframe src="https://player.vimeo.com/video/${id}" width="100%" height="315" frameborder="0" allowfullscreen loading="lazy"></iframe>`
-      );
+      return buildIframe(`https://player.vimeo.com/video/${id}`);
     }
 
     if (host === "soundcloud.com" || host === "w.soundcloud.com") {
-      return sanitizeEmbedHtml(
-        `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(trimmed)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>`
+      return buildIframe(
+        `https://w.soundcloud.com/player/?url=${encodeURIComponent(trimmed)}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true`,
+        "166"
       );
     }
 
     if (host.endsWith("bandcamp.com")) {
-      return sanitizeEmbedHtml(
-        `<iframe style="border:0;width:100%;height:120px" src="${trimmed.replace(/\/$/, "")}/size=large/bgcol=333333/linkcol=ffffff/tracklist=false/artwork=small/transparent=true/" seamless></iframe>`
+      return buildIframe(
+        `${trimmed.replace(/\/$/, "")}/size=large/bgcol=333333/linkcol=ffffff/tracklist=false/artwork=small/transparent=true/`,
+        "120"
       );
     }
 
     if (host === "open.spotify.com") {
       const path = parsed.pathname.replace("/embed", "");
-      return sanitizeEmbedHtml(
-        `<iframe src="https://open.spotify.com/embed${path}" width="100%" height="152" frameborder="0" allowfullscreen loading="lazy"></iframe>`
-      );
+      return buildIframe(`https://open.spotify.com/embed${path}`, "152");
     }
   } catch {
     return "";

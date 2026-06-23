@@ -4,7 +4,13 @@ import { neon } from "@neondatabase/serverless";
 config({ path: ".env.local" });
 config({ path: ".env" });
 
-const sql = neon(process.env.DATABASE_URL);
+const databaseUrl = process.env.DATABASE_URL?.trim();
+if (!databaseUrl) {
+  console.log("DATABASE_URL no configurada — omitiendo init de base de datos.");
+  process.exit(0);
+}
+
+const sql = neon(databaseUrl);
 
 await sql`
   DO $$ BEGIN

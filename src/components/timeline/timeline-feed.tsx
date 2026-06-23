@@ -64,7 +64,7 @@ export function TimelineFeed({ posts }: TimelineFeedProps) {
   return (
     <div className="grid gap-10 lg:grid-cols-[110px_minmax(0,1fr)] lg:gap-16">
       <div className="hidden lg:block">
-        <div className="sticky top-28">
+        <div className="sticky top-[calc(var(--site-header-height)+1.5rem)]">
           <TimelineRuler
             months={months}
             activeMonth={activeMonth}
@@ -75,7 +75,7 @@ export function TimelineFeed({ posts }: TimelineFeedProps) {
 
       <div className="min-w-0 space-y-10 lg:col-start-2">
         <div className="lg:hidden">
-          <div className="sticky top-16 z-20 -mx-4 border-b border-border bg-background/90 px-4 py-3 backdrop-blur">
+          <div className="sticky top-[var(--site-header-height)] z-20 -mx-4 border-b border-border bg-background/90 px-4 py-3 backdrop-blur">
             <TimelineRuler
               months={months}
               activeMonth={activeMonth}
@@ -93,7 +93,7 @@ export function TimelineFeed({ posts }: TimelineFeedProps) {
             ref={(element) => {
               sectionRefs.current[month.key] = element;
             }}
-            className="scroll-mt-28 space-y-14"
+            className="scroll-mt-[calc(var(--site-header-height)+1.5rem)] space-y-14"
           >
             <div className="flex items-center gap-3 lg:hidden">
               <h2 className="font-heading text-sm uppercase tracking-[0.3em] text-muted-foreground">

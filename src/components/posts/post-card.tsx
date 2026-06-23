@@ -21,7 +21,7 @@ export function PostEntry({ post, id, className }: PostEntryProps) {
     <article
       id={id}
       className={cn(
-        "scroll-mt-28 border-b border-border/60 pb-14 last:border-b-0",
+        "scroll-mt-[calc(var(--site-header-height)+1.5rem)] border-b border-border/60 pb-14 last:border-b-0",
         className
       )}
     >
@@ -36,26 +36,20 @@ export function PostEntry({ post, id, className }: PostEntryProps) {
         <div className="min-w-0 space-y-5">
           <time
             dateTime={post.eventDate.toISOString()}
-            className="block text-sm uppercase tracking-[0.2em] text-muted-foreground"
+            className="block text-sm uppercase tracking-[0.2em] text-[#46FF2E]"
           >
             {format(post.eventDate, "EEEE d 'de' MMMM yyyy", { locale: es })}
           </time>
 
           <h2 className="font-heading text-3xl leading-tight md:text-4xl">{post.title}</h2>
 
-          <p className="text-sm text-muted-foreground">
-            <span className="uppercase tracking-[0.15em]">Autor</span>
-            <span className="mx-2" aria-hidden>
-              ·
-            </span>
-            <span>{author.label}</span>
-          </p>
+          <p className="text-sm text-[#46FF2E]">{author.label}</p>
 
           <PostContent content={post.body} />
         </div>
 
         {post.coverImageUrl ? (
-          <div className="relative aspect-[4/5] w-full overflow-hidden bg-black lg:sticky lg:top-28">
+          <div className="relative aspect-[4/5] w-full overflow-hidden bg-black lg:sticky lg:top-[calc(var(--site-header-height)+1.5rem)]">
             <Image
               src={post.coverImageUrl}
               alt={post.title}

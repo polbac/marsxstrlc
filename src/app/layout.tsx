@@ -22,7 +22,7 @@ const plexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Bitácora Mars",
+    default: "CRONICAS MARS x STRLC RECORDS",
     template: "%s",
   },
   description: "Bitácora del proceso creativo de la obra sonora de Mars.",
